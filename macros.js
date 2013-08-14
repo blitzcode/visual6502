@@ -73,7 +73,7 @@ function go(){
 		}
 	}
 	if(running) {
-           step();
+            for(var i=0;i<25;i++){step();}
 	   setTimeout(go, 0); // schedule the next poll
         }
 }
@@ -201,7 +201,7 @@ var goldenChecksum;
 function step(){
 	var s=stateString();
 	var m=getMem();
-	trace[cycle]= {chip: s, mem: m};
+	//trace[cycle]= {chip: s, mem: m};
 	if(goldenChecksum != undefined)
 		traceChecksum=adler32(traceChecksum+s+m.slice(0,511).toString(16));
 	halfStep();
@@ -264,7 +264,8 @@ function readPstring(){
    var result;
    result = (isNodeHigh(nodenames['p7'])?'N':'n') +
             (isNodeHigh(nodenames['p6'])?'V':'v') +
-            '&#8209' +  // non-breaking hyphen
+            //'&#8209' +  // non-breaking hyphen
+            '-' +
             (isNodeHigh(nodenames['p4'])?'B':'b') +
             (isNodeHigh(nodenames['p3'])?'D':'d') +
             (isNodeHigh(nodenames['p2'])?'I':'i') +
@@ -448,6 +449,7 @@ function stepBack(){
 }
 
 function chipStatus(){
+    /*
 	var ab = readAddressBus();
 	var machine1 =
 	        ' halfcyc:' + cycle +
@@ -471,11 +473,11 @@ function chipStatus(){
 		if(goldenChecksum != undefined)
 			machine3 += " Chk:" + traceChecksum + ((traceChecksum==goldenChecksum)?" OK":" no match");
 	}
-	setStatus(machine1, machine2, machine3);
+	setStatus(machine1, machine2, machine3);*/
 	if (logThese.length>1) {
 		updateLogbox(logThese);
 	}
-	selectCell(ab);
+	//selectCell(ab);
 }
 
 // run for an extended number of cycles, with low overhead, for interactive programs or for benchmarking
@@ -580,6 +582,7 @@ function updateLogDirection(){
 }
 
 // update the table of signal values, by prepending or appending
+/*
 function updateLogbox(names){
 	var signals=[];
 	var odd=true;
@@ -597,11 +600,29 @@ function updateLogbox(names){
 	}
 	row = "<tr>" + signals.join("") + "</tr>";
 	if(logboxAppend)
+        {
 	        logStream.push(row);
+                console.log(row);
+        }
 	else
 		logStream.splice(1,0,row);
 
 	logbox.innerHTML = logStream.join("");
+}
+*/
+
+function updateLogbox(names){
+	var signals=[];
+	var odd=true;
+	var bg;
+	var row;
+
+	for(var i in names){
+		signals.push(busToString(names[i]));
+		odd =! odd;
+	}
+	row = signals.join("\t")
+        console.log(row);
 }
 
 function getMem(){
@@ -632,7 +653,7 @@ function disassemblytoHTML(byte){
 	var opcode=disassembly[byte];
 	if(typeof opcode == "undefined")
 		return "unknown"
-	return opcode.replace(/ /,'&nbsp;');
+	return opcode;//opcode.replace(/ /,'&nbsp;');
 }
 
 // opcode lookup for 6502 - not quite a disassembly
